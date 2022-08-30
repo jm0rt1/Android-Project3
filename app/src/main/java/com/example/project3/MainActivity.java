@@ -16,6 +16,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initUIResources();
+    }
+
+    private void initUIResources() {
+        mNameEditText = findViewById(R.id.name_edit_text);
+        mPasswordEditText = findViewById(R.id.password_edit_text);
+        mLoginButton = findViewById(R.id.login_button);
     }
 
     public void login(View v){
