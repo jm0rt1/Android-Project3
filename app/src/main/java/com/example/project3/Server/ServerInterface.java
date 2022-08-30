@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
@@ -23,7 +22,7 @@ import java.util.Objects;
 public class ServerInterface {
     public static final String TAG = "ServerInterface";
     public static class Messages {
-        private static String postsJsonCache = ""; // TODO: need to cache this in a better way for a bigger database
+        private static String messagesJsonCache = ""; // TODO: need to cache this in a better way for a bigger database
         private static long timeSinceLastUpdate = 0;
 
         private static class Keys {
@@ -37,8 +36,8 @@ public class ServerInterface {
         private static void  guard(){
             //Call first in every method
 
-            if ((Objects.equals(postsJsonCache, "") || timeSinceLastUpdate == 0)||(timeSinceLastUpdate+(1000)*60 > Instant.now().toEpochMilli())){
-                postsJsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(ServerCommands.Urls.POSTS);
+            if ((Objects.equals(messagesJsonCache, "") || timeSinceLastUpdate == 0)||(timeSinceLastUpdate+(1000)*60 > Instant.now().toEpochMilli())){
+                messagesJsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(ServerCommands.Urls.MESSAGES);
             }
         }
 
@@ -46,7 +45,7 @@ public class ServerInterface {
         private static ArrayList<String> getTitles() throws JSONException {
             guard();
 
-            JSONArray jsonArray = new JSONArray(postsJsonCache);
+            JSONArray jsonArray = new JSONArray(messagesJsonCache);
             ArrayList<String> names = new ArrayList<String>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -60,7 +59,7 @@ public class ServerInterface {
 
             guard();
 
-            JSONArray jsonArray = new JSONArray(postsJsonCache);
+            JSONArray jsonArray = new JSONArray(messagesJsonCache);
             ArrayList<String[]> names = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 String[] pair = new String[3];
@@ -140,11 +139,11 @@ public class ServerInterface {
             protected void onPostExecute(ArrayList<String[]> data) {
 
 
-                final PostRecyclerAdapter adapter = new PostRecyclerAdapter(parentRef.get().getApplicationContext(), data);
-
-                recyclerViewRef.get().setHasFixedSize(true);
-                recyclerViewRef.get().setAdapter(adapter);
-                recyclerViewRef.get().setItemAnimator(new DefaultItemAnimator());
+//                final PostRecyclerAdapter adapter = new PostRecyclerAdapter(parentRef.get().getApplicationContext(), data);
+//
+//                recyclerViewRef.get().setHasFixedSize(true);
+//                recyclerViewRef.get().setAdapter(adapter);
+//                recyclerViewRef.get().setItemAnimator(new DefaultItemAnimator());
             }
         }
 
