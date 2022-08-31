@@ -1,6 +1,6 @@
 package com.example.project3.Model;
 
-public class Message {
+public class Message{
 
     private String mMessageBody;
     private int mSenderId;
@@ -19,6 +19,8 @@ public class Message {
         mConversationId = conversationId;
 
     }
+
+
     public int getId() {
         return mId;
     }

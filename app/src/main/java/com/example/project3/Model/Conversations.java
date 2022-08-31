@@ -4,14 +4,12 @@ import java.util.ArrayList;
 
 public class Conversations {
     public static class Conversation{
-        public ArrayList<Message> mSentMessages;
-        public ArrayList<Message> mReceivedMessages;
+        public ArrayList<Message> mMessages;
         User mOtherUser;
         int mConversationId;
 
-        public Conversation(ArrayList<Message> sentMessages, ArrayList<Message> receivedMessages, User otherUser, int conversationId){
-            mSentMessages = sentMessages;
-            mReceivedMessages = receivedMessages;
+        public Conversation(ArrayList<Message> messages,  User otherUser, int conversationId){
+            mMessages = messages;
             mOtherUser = otherUser;
             mConversationId = conversationId;
         }
