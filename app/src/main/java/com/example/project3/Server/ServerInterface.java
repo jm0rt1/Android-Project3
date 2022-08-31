@@ -43,6 +43,8 @@ public class ServerInterface {
             public static String SENDER_ID = "sender_id";
             public static String PARENT_MESSAGE_ID = "parent_message_id";
             public static String RECIPIENT_ID = "recipient_id";
+            public static String CONVERSATION_ID = "conversation_id";
+
         }
 
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -89,7 +91,8 @@ public class ServerInterface {
                         obj.getString(Keys.MESSAGE_BODY),
                         Integer.parseInt(obj.getString(Keys.SENDER_ID)),
                         parent,
-                        Integer.parseInt(obj.getString(Keys.RECIPIENT_ID)));
+                        Integer.parseInt(obj.getString(Keys.RECIPIENT_ID)),
+                        Integer.parseInt(obj.getString(Keys.CONVERSATION_ID)));
 
 
                 messages.add(message);

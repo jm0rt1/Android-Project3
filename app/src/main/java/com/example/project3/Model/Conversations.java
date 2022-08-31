@@ -6,10 +6,12 @@ public class Conversations {
     public class Conversation{
         ArrayList<Message> mSentMessages;
         ArrayList<Message> mReceivedMessages;
+        User mOtherUser;
 
-        public Conversation(ArrayList<Message> sentMessages, ArrayList<Message> receivedMessages){
+        public Conversation(ArrayList<Message> sentMessages, ArrayList<Message> receivedMessages, User otherUser){
             mSentMessages = sentMessages;
             mReceivedMessages = receivedMessages;
+            mOtherUser = otherUser;
         }
     }
     ArrayList<Conversation> mConversations;
