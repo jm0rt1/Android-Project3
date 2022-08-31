@@ -6,13 +6,20 @@ public class Conversations {
     public static class Conversation{
         public ArrayList<Message> mMessages;
         public User mOtherUser;
-        int mConversationId;
 
+
+
+        int mConversationId;
+        public int getConversationId() {
+            return mConversationId;
+        }
         public Conversation(ArrayList<Message> messages,  User otherUser, int conversationId){
             mMessages = messages;
             mOtherUser = otherUser;
             mConversationId = conversationId;
         }
+
+
     }
     ArrayList<Conversation> mConversations;
 

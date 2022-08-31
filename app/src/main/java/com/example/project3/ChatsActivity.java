@@ -4,7 +4,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,9 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.project3.Model.Conversations;
 import com.example.project3.Model.Message;
@@ -61,7 +58,7 @@ public class ChatsActivity extends AppCompatActivity {
         protected Conversations doInBackground(Void... voids) {
             try {
                 ArrayList<Message> sentMessages = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
-                ArrayList<Message> receivedMessages = ServerInterface.Messages.getRecievedMessages(Model.getInstance().getUser().id);
+                ArrayList<Message> receivedMessages = ServerInterface.Messages.getReceivedMessages(Model.getInstance().getUser().id);
 
 //                messages.addAll(sentMessages);
 //                messages.addAll(receivedMessages);
@@ -78,7 +75,7 @@ public class ChatsActivity extends AppCompatActivity {
                     }
                 }
                 for (int i=0; i<receivedMessages.size();i++){
-                    int messageConversationId = sentMessages.get(i).getConversationId();
+                    int messageConversationId = receivedMessages.get(i).getConversationId();
                     if (!conversationIds.contains(messageConversationId)){
                         conversationIds.add(messageConversationId);
                     }
@@ -94,16 +91,16 @@ public class ChatsActivity extends AppCompatActivity {
                     for (int j=0; j<receivedMessages.size();j++){
                         int messageConversationId = receivedMessages.get(i).getConversationId();
                         if (conversationIds.get(i) == messageConversationId){
-                            otherUserId = receivedMessages.get(i).getSenderId();
-                            messages.add(receivedMessages.get(i) );
+                            otherUserId = receivedMessages.get(j).getSenderId();
+                            messages.add(receivedMessages.get(j) );
                         }
                     }
 
                     for (int j=0; j<sentMessages.size();j++){
                         int messageConversationId = sentMessages.get(i).getConversationId();
                         if (conversationIds.get(i) == messageConversationId){
-                            otherUserId = sentMessages.get(i).getRecipientId();
-                            messages.add(sentMessages.get(i));
+                            otherUserId = sentMessages.get(j).getRecipientId();
+                            messages.add(sentMessages.get(j));
                         }
                     }
                     if (messages.size()>0){

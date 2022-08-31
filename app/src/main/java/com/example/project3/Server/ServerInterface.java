@@ -67,7 +67,7 @@ public class ServerInterface {
 
 
         @RequiresApi(api = Build.VERSION_CODES.O)
-        public static ArrayList<Message> getRecievedMessages(int recipientId) throws JSONException {
+        public static ArrayList<Message> getReceivedMessages(int recipientId) throws JSONException {
 
             JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.MESSAGES_BY_RECIPIENT+String.valueOf(recipientId));
             ArrayList<Message> messages = jsonCacheToArrayList();
@@ -101,38 +101,26 @@ public class ServerInterface {
             return messages;
         }
 
-        private static boolean sendMessage(int owner_id, String title, String content, Context c){
+        public static boolean sendMessage(Message message, Context c){
 
 
 
-
-            if(title.equals(""))
-            {
-                Toast.makeText(c, "title field cannot be empty", Toast.LENGTH_SHORT).show();
-            }
-            else if(content.equals(""))
-            {
-                Toast.makeText(c, "content field cannot be empty", Toast.LENGTH_SHORT).show();
-            }
-            else if(!(owner_id>=1))
-            {
-                Toast.makeText(c, "owner id field not valid ="+String.valueOf(owner_id), Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
                 JSONObject newPost = new JSONObject();
-//                try {
-//                    newPost.put(Keys.TITLE, title);
-//                    newPost.put(Keys.CONTENT, content);
-//                    newPost.put(Keys.OWNER, owner_id);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    newPost.put(Keys.MESSAGE_BODY, message.getMessageBody());
+                    newPost.put(Keys.SENDER_ID, message.getSenderId());
+                    newPost.put(Keys.PARENT_MESSAGE_ID, message.getParentMessageId());
+                    newPost.put(Keys.RECIPIENT_ID, message.getRecipientId());
+                    newPost.put(Keys.CONVERSATION_ID, message.getConversationId());
+                    newPost.put(Keys.ID, message.getId());
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 return ServerCommands.sendHttpPostRequest(ServerCommands.Urls.MESSAGES_ADD, newPost);
 
-            }
-            return false;
+
         }
 
         private static boolean deletePost(String id){

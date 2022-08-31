@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -62,25 +60,23 @@ public class ConversationActivity extends AppCompatActivity {
     public void send(View v){
         String message = mMessageEditText.getText().toString();
         Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
-        conv.mMessages.add(new Message(3,message,1,4,2,1));
-        RefreshRecycler();
+//        conv.mMessages.add(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()));
+        new SendMessage(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()),this,mMessageRecycler).execute();
     }
 
     final class RefreshChats extends AsyncTask<Void, Integer, Conversations> {
         private final WeakReference<Activity> parentRef;
-        private final WeakReference<ListView> listViewRef;
 
 
-        public RefreshChats(final Activity parent, ListView listView){
+        public RefreshChats(final Activity parent){
             parentRef = new WeakReference<Activity>(parent);
-            listViewRef = new WeakReference<ListView>(listView);
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         protected Conversations doInBackground(Void... voids) {
             try {
                 ArrayList<Message> sentMessages = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
-                ArrayList<Message> receivedMessages = ServerInterface.Messages.getRecievedMessages(Model.getInstance().getUser().id);
+                ArrayList<Message> receivedMessages = ServerInterface.Messages.getReceivedMessages(Model.getInstance().getUser().id);
 
 //                messages.addAll(sentMessages);
 //                messages.addAll(receivedMessages);
@@ -97,7 +93,7 @@ public class ConversationActivity extends AppCompatActivity {
                     }
                 }
                 for (int i=0; i<receivedMessages.size();i++){
-                    int messageConversationId = sentMessages.get(i).getConversationId();
+                    int messageConversationId = receivedMessages.get(i).getConversationId();
                     if (!conversationIds.contains(messageConversationId)){
                         conversationIds.add(messageConversationId);
                     }
@@ -113,16 +109,16 @@ public class ConversationActivity extends AppCompatActivity {
                     for (int j=0; j<receivedMessages.size();j++){
                         int messageConversationId = receivedMessages.get(i).getConversationId();
                         if (conversationIds.get(i) == messageConversationId){
-                            otherUserId = receivedMessages.get(i).getSenderId();
-                            messages.add(receivedMessages.get(i) );
+                            otherUserId = receivedMessages.get(j).getSenderId();
+                            messages.add(receivedMessages.get(j) );
                         }
                     }
 
                     for (int j=0; j<sentMessages.size();j++){
                         int messageConversationId = sentMessages.get(i).getConversationId();
                         if (conversationIds.get(i) == messageConversationId){
-                            otherUserId = sentMessages.get(i).getRecipientId();
-                            messages.add(sentMessages.get(i));
+                            otherUserId = sentMessages.get(j).getRecipientId();
+                            messages.add(sentMessages.get(j));
                         }
                     }
                     if (messages.size()>0){
@@ -150,9 +146,42 @@ public class ConversationActivity extends AppCompatActivity {
         protected void onPostExecute(Conversations result) {
 
             Model.getInstance().setConversations(result);
+            RefreshRecycler();
 
 
             }
         }
+
+
+    final class SendMessage extends AsyncTask<Void, Integer, Boolean> {
+        private final WeakReference<Activity> parentRef;
+        private final WeakReference<RecyclerView> recyclerViewRef;
+        private final Message mMessage;
+
+
+        public SendMessage(Message message, final Activity parent, RecyclerView recyclerView){
+            parentRef = new WeakReference<Activity>(parent);
+            recyclerViewRef = new WeakReference<RecyclerView>(recyclerView);
+            mMessage=message;
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+
+            return ServerInterface.Messages.sendMessage(mMessage, parentRef.get().getApplicationContext());
+
+        }
+        @Override
+        protected void onPostExecute(Boolean result) {
+
+            new RefreshChats(this.parentRef.get()).execute();
+
+
+        }
+    }
+
+
+
+
 
 }
