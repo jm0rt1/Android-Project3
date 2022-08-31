@@ -21,7 +21,7 @@ public class ConversationActivity extends AppCompatActivity {
 
         Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
 
-        mMessageAdapter = new ConversationAdapter(this, conv.mMessages);
+        mMessageAdapter = new ConversationAdapter(this, conv);
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
         mMessageRecycler.setAdapter(mMessageAdapter);
     }

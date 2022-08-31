@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Conversations {
     public static class Conversation{
         public ArrayList<Message> mMessages;
-        User mOtherUser;
+        public User mOtherUser;
         int mConversationId;
 
         public Conversation(ArrayList<Message> messages,  User otherUser, int conversationId){

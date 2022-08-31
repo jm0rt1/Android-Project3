@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.project3.Model.Conversations;
 import com.example.project3.Model.Message;
 import com.example.project3.Model.Model;
 
@@ -18,11 +19,13 @@ public class ConversationAdapter extends RecyclerView.Adapter {
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
 
     private Context mContext;
+    private Conversations.Conversation mConversation;
     private List<Message> mMessageList;
 
-    public ConversationAdapter(Context context, List<Message> messageList) {
+    public ConversationAdapter(Context context, Conversations.Conversation conversation) {
         mContext = context;
-        mMessageList = messageList;
+        this.mConversation = conversation;
+        mMessageList = conversation.mMessages;
     }
     @Override
     public int getItemCount() {
@@ -110,7 +113,7 @@ public class ConversationAdapter extends RecyclerView.Adapter {
             // Format the stored timestamp into a readable String using method.
 //            timeText.setText(Utils.formatDateTime(message.getCreatedAt()));
 
-//            nameText.setText(message.getSenderId().getNickname());
+            nameText.setText(mConversation.mOtherUser.name);
 
             // Insert the profile image from the URL into the ImageView.
 //            Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);
