@@ -37,10 +37,18 @@ public class ConversationActivity extends AppCompatActivity {
     private ConversationAdapter mMessageAdapter;
 
     private EditText mMessageEditText;
+    private User mOtherUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
+        int id = getIntent().getIntExtra("other_user_id",0);
+        try {
+            mOtherUser = Model.getInstance().getConversations().getOtherUser(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.custom_toolbar);
         setSupportActionBar(myToolbar);
@@ -50,7 +58,11 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageRecycler = (RecyclerView) findViewById(R.id.conversation_recycler_view);
         mMessageEditText = (EditText)  findViewById(R.id.message_edit_text);
 
-        RefreshRecycler();
+        try {
+            RefreshRecycler();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         final Handler handler = new Handler();
         Timer timer = new Timer();
@@ -68,8 +80,8 @@ public class ConversationActivity extends AppCompatActivity {
         timer.schedule(task, 0, 1000); //it executes this every 1000ms
     }
 
-    private void RefreshRecycler() {
-        Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
+    private void RefreshRecycler() throws Exception {
+        Conversations.Conversation conv = Model.getInstance().getConversations().getConversationByOtherUserId(mOtherUser.id);
 
         mMessageAdapter = new ConversationAdapter(this, conv);
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -77,10 +89,10 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageRecycler.scrollToPosition(conv.mMessages.size()-1);
     }
 
-    public void send(View v){
+    public void send(View v) throws Exception {
         String message = mMessageEditText.getText().toString();
-        Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
-        new SendMessage(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()),this,mMessageRecycler).execute();
+        Conversations.Conversation conv = Model.getInstance().getConversations().getConversationByOtherUserId(mOtherUser.id);
+        new SendMessage(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id),this,mMessageRecycler).execute();
         mMessageEditText.setText("");
 
     }
@@ -105,39 +117,44 @@ public class ConversationActivity extends AppCompatActivity {
 
 
                 // TODO Build conversations and save into model
-                ArrayList<Integer> conversationIds = new ArrayList();
                 Conversations conversations = new Conversations();
+                ArrayList<User> otherUsers = new ArrayList();
                 for (int i=0; i<sentMessages.size();i++){
-                    int messageConversationId = sentMessages.get(i).getConversationId();
-                    if (!conversationIds.contains(messageConversationId)){
-                        conversationIds.add(messageConversationId);
+                    for (int j=0; j<otherUsers.size();j++){
+                        if (otherUsers.get(j).id == (sentMessages.get(i).getRecipientId())){
+                            ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId());
+                            otherUsers.add(ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId()));
+                        }
                     }
+
                 }
                 for (int i=0; i<receivedMessages.size();i++){
-                    int messageConversationId = receivedMessages.get(i).getConversationId();
-                    if (!conversationIds.contains(messageConversationId)){
-                        conversationIds.add(messageConversationId);
+                    for (int j=0; j<otherUsers.size();j++){
+                        if (otherUsers.get(j).id == (receivedMessages.get(i).getRecipientId())){
+                            ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId());
+                            otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getRecipientId()));
+                        }
                     }
                 }
 
                 int otherUserId =0;
-                for (int i=0; i<conversationIds.size(); i++){
+                for (int i=0; i<otherUsers.size(); i++){
 //                    ArrayList<Message> convSent = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
 //                    ArrayList<Message> convReceived = ServerInterface.Messages.getRecievedMessages(Model.getInstance().getUser().id);
 
                     ArrayList<Message> messages = new ArrayList<>();
 
                     for (int j=0; j<receivedMessages.size();j++){
-                        int messageConversationId = receivedMessages.get(i).getConversationId();
-                        if (conversationIds.get(i) == messageConversationId){
+                        otherUserId = receivedMessages.get(i).getSenderId();
+                        if (otherUsers.get(i).id == otherUserId){
                             otherUserId = receivedMessages.get(j).getSenderId();
                             messages.add(receivedMessages.get(j) );
                         }
                     }
 
                     for (int j=0; j<sentMessages.size();j++){
-                        int messageConversationId = sentMessages.get(i).getConversationId();
-                        if (conversationIds.get(i) == messageConversationId){
+                        otherUserId = sentMessages.get(i).getRecipientId();
+                        if (otherUsers.get(i).id == otherUserId){
                             otherUserId = sentMessages.get(j).getRecipientId();
                             messages.add(sentMessages.get(j));
                         }
@@ -146,7 +163,7 @@ public class ConversationActivity extends AppCompatActivity {
                         if (otherUserId != 0) {
                             User other = ServerInterface.Users.getUserById(otherUserId);
                             messages.sort(Comparator.comparing(Message::getParentMessageId));
-                            Conversations.Conversation conv = new Conversations.Conversation(messages,other,conversationIds.get(i));
+                            Conversations.Conversation conv = new Conversations.Conversation(messages,other);
                             conversations.addConversation(conv);
                         }
                     }
@@ -167,10 +184,14 @@ public class ConversationActivity extends AppCompatActivity {
         protected void onPostExecute(Conversations result) {
 
             Model.getInstance().setConversations(result);
-            RefreshRecycler();
-
-
+            try {
+                RefreshRecycler();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+
+        }
         }
 
 

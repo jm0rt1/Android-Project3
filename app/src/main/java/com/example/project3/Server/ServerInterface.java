@@ -91,8 +91,7 @@ public class ServerInterface {
                         obj.getString(Keys.MESSAGE_BODY),
                         Integer.parseInt(obj.getString(Keys.SENDER_ID)),
                         parent,
-                        Integer.parseInt(obj.getString(Keys.RECIPIENT_ID)),
-                        Integer.parseInt(obj.getString(Keys.CONVERSATION_ID)));
+                        Integer.parseInt(obj.getString(Keys.RECIPIENT_ID)));
 
 
                 messages.add(message);
@@ -111,7 +110,7 @@ public class ServerInterface {
                     newPost.put(Keys.SENDER_ID, message.getSenderId());
                     newPost.put(Keys.PARENT_MESSAGE_ID, message.getParentMessageId());
                     newPost.put(Keys.RECIPIENT_ID, message.getRecipientId());
-                    newPost.put(Keys.CONVERSATION_ID, message.getConversationId());
+
                     newPost.put(Keys.ID, message.getId());
 
                 } catch (JSONException e) {

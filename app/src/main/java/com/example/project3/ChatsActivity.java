@@ -26,6 +26,7 @@ import com.example.project3.Server.ServerInterface;
 import org.json.JSONException;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -63,45 +64,47 @@ public class ChatsActivity extends AppCompatActivity {
                 ArrayList<Message> sentMessages = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
                 ArrayList<Message> receivedMessages = ServerInterface.Messages.getReceivedMessages(Model.getInstance().getUser().id);
 
-//                messages.addAll(sentMessages);
-//                messages.addAll(receivedMessages);
-
-
-
                 // TODO Build conversations and save into model
-                ArrayList<Integer> conversationIds = new ArrayList();
                 Conversations conversations = new Conversations();
+                ArrayList<Integer> otherUserIds = new ArrayList();
+                ArrayList<User> otherUsers = new ArrayList();
+
                 for (int i=0; i<sentMessages.size();i++){
-                    int messageConversationId = sentMessages.get(i).getConversationId();
-                    if (!conversationIds.contains(messageConversationId)){
-                        conversationIds.add(messageConversationId);
+                    if (!otherUserIds.contains(sentMessages.get(i).getRecipientId())){
+                        ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId());
+                        otherUsers.add(ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId()));
+                        otherUserIds.add(sentMessages.get(i).getRecipientId());
                     }
                 }
                 for (int i=0; i<receivedMessages.size();i++){
-                    int messageConversationId = receivedMessages.get(i).getConversationId();
-                    if (!conversationIds.contains(messageConversationId)){
-                        conversationIds.add(messageConversationId);
+
+                    if (!otherUserIds.contains(receivedMessages.get(i).getSenderId())){
+                        ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId());
+                        otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getRecipientId()));
+                        otherUserIds.add(receivedMessages.get(i).getSenderId());
+
                     }
+
                 }
 
                 int otherUserId =0;
-                for (int i=0; i<conversationIds.size(); i++){
+                for (int i=0; i<otherUsers.size(); i++){
 //                    ArrayList<Message> convSent = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
 //                    ArrayList<Message> convReceived = ServerInterface.Messages.getRecievedMessages(Model.getInstance().getUser().id);
 
                     ArrayList<Message> messages = new ArrayList<>();
 
                     for (int j=0; j<receivedMessages.size();j++){
-                        int messageConversationId = receivedMessages.get(i).getConversationId();
-                        if (conversationIds.get(i) == messageConversationId){
+                        otherUserId = receivedMessages.get(i).getSenderId();
+                        if (otherUsers.get(i).id == otherUserId){
                             otherUserId = receivedMessages.get(j).getSenderId();
                             messages.add(receivedMessages.get(j) );
                         }
                     }
 
                     for (int j=0; j<sentMessages.size();j++){
-                        int messageConversationId = sentMessages.get(i).getConversationId();
-                        if (conversationIds.get(i) == messageConversationId){
+                        otherUserId = sentMessages.get(i).getRecipientId();
+                        if (otherUsers.get(i).id == otherUserId){
                             otherUserId = sentMessages.get(j).getRecipientId();
                             messages.add(sentMessages.get(j));
                         }
@@ -110,7 +113,7 @@ public class ChatsActivity extends AppCompatActivity {
                         if (otherUserId != 0) {
                             User other = ServerInterface.Users.getUserById(otherUserId);
                             messages.sort(Comparator.comparing(Message::getParentMessageId));
-                            Conversations.Conversation conv = new Conversations.Conversation(messages,other,conversationIds.get(i));
+                            Conversations.Conversation conv = new Conversations.Conversation(messages,other);
                             conversations.addConversation(conv);
                         }
                     }
@@ -134,8 +137,8 @@ public class ChatsActivity extends AppCompatActivity {
 
             Model.getInstance().getConversations();
             listViewRef.get();
+            Integer[] ids = Model.getInstance().getConversations().getUserIds();
 
-            ;
             ChatsList adapter = new ChatsList(ChatsActivity.this, Model.getInstance().getConversations().getChatNames());
 
 
@@ -147,6 +150,7 @@ public class ChatsActivity extends AppCompatActivity {
 
 
                     Intent intent = new Intent(parentRef.get().getApplicationContext(), ConversationActivity.class);
+                    intent.putExtra("other_user_id", ids[position]);
                     startActivity(intent);
 
                 }

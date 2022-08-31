@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class ChatsList extends ArrayAdapter<String> {
     private final Activity context;
     private final String[] names;
+
 //    private final Integer[] mConvIds;
 
     public ChatsList(Activity context, String[] s)

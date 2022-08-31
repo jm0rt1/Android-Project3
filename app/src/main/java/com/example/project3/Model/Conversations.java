@@ -8,15 +8,10 @@ public class Conversations {
         public User mOtherUser;
 
 
-
-        int mConversationId;
-        public int getConversationId() {
-            return mConversationId;
-        }
-        public Conversation(ArrayList<Message> messages,  User otherUser, int conversationId){
+        public Conversation(ArrayList<Message> messages,  User otherUser){
             mMessages = messages;
             mOtherUser = otherUser;
-            mConversationId = conversationId;
+
         }
 
 
@@ -30,13 +25,25 @@ public class Conversations {
     public void addConversation(Conversation convToAdd){
         mConversations.add(convToAdd);
     }
-    public Conversation getConversationById(int id){
+
+    public Conversation getConversationByOtherUser(User user) throws Exception {
+        int userId = user.id;
         for(int i = 0; i<mConversations.size(); i++) {
-            if (mConversations.get(i).mConversationId == id){
+            if (mConversations.get(i).mOtherUser.id == userId){
                 return mConversations.get(i);
             }
         }
-        return null;
+        throw new Exception("could not find user");
+    }
+
+    public Conversation getConversationByOtherUserId(int userId) throws Exception {
+        for(int i = 0; i<mConversations.size(); i++) {
+            if (mConversations.get(i).mOtherUser.id == userId){
+                return mConversations.get(i);
+            }
+        }
+        throw new Exception("could not find user id");
+
     }
 
 
@@ -47,5 +54,32 @@ public class Conversations {
         }
         return chatNames;
     }
+
+    public Integer[] getUserIds(){
+        Integer[] ids = new Integer[mConversations.size()];
+        for (int i=0; i<mConversations.size(); i++){
+            ids[i]=(mConversations.get(i).mOtherUser.id);
+        }
+        return ids;
+    }
+
+    public User[] getOtherUsers(){
+        User[] users = new User[mConversations.size()];
+        for (int i=0; i<mConversations.size(); i++){
+            users[i]=(mConversations.get(i).mOtherUser);
+        }
+        return users;
+    }
+
+    public User getOtherUser(int id) throws Exception {
+        for (int i=0; i<mConversations.size(); i++){
+            if (id == mConversations.get(i).mOtherUser.id){
+                return mConversations.get(i).mOtherUser;
+            }
+        }
+        throw new Exception("could not find user");
+
+    }
+
 
 }

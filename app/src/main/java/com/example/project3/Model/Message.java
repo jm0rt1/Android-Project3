@@ -6,17 +6,16 @@ public class Message{
     private int mSenderId;
     private int mParentMessageId;
     private int mRecipientId;
-    private int mConversationId;
 
 
 
-    public Message(int id, String messageBody, int senderId, int parentMessageId, int RecipientId, int conversationId){
+
+    public Message(int id, String messageBody, int senderId, int parentMessageId, int RecipientId){
         mId = id;
         mMessageBody = messageBody;
         mSenderId = senderId;
         mParentMessageId = parentMessageId;
         mRecipientId = RecipientId;
-        mConversationId = conversationId;
 
     }
 
@@ -43,8 +42,6 @@ public class Message{
         return mRecipientId;
     }
 
-    public int getConversationId() {
-        return mConversationId;
-    }
+
 
 }
