@@ -7,6 +7,8 @@
         <entry key="app/src/main/res/layout/activity_conversation.xml" value="0.2682926829268293" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/chats_list_view_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/message_received_item.xml" value="0.26497758055651205" />
+        <entry key="app/src/main/res/layout/message_sent_item.xml" value="0.17512817382812496" />
       </map>
     </option>
   </component>

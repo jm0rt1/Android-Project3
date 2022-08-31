@@ -133,8 +133,11 @@ public class ChatsActivity extends AppCompatActivity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long l) {
-                    Toast toast = Toast.makeText(ChatsActivity.this, parent.getItemAtPosition(position).toString()+" is Pokemon #"+Integer.toString(position+1), Toast.LENGTH_SHORT);
-                    toast.show();
+
+
+                    Intent intent = new Intent(parentRef.get().getApplicationContext(), ConversationActivity.class);
+                    startActivity(intent);
+
                 }
             });
         }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class Conversations {
     public static class Conversation{
-        ArrayList<Message> mSentMessages;
-        ArrayList<Message> mReceivedMessages;
+        public ArrayList<Message> mSentMessages;
+        public ArrayList<Message> mReceivedMessages;
         User mOtherUser;
         int mConversationId;
 
@@ -24,6 +24,14 @@ public class Conversations {
 
     public void addConversation(Conversation convToAdd){
         mConversations.add(convToAdd);
+    }
+    public Conversation getConversationById(int id){
+        for(int i = 0; i<mConversations.size(); i++) {
+            if (mConversations.get(i).mConversationId == id){
+                return mConversations.get(i);
+            }
+        }
+        return null;
     }
     public String[] getChatNames(){
         String[] chatNames = new String[mConversations.size()];
