@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,6 +29,8 @@ import org.json.JSONException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConversationActivity extends AppCompatActivity {
     private RecyclerView mMessageRecycler;
@@ -46,6 +51,21 @@ public class ConversationActivity extends AppCompatActivity {
         mMessageEditText = (EditText)  findViewById(R.id.message_edit_text);
 
         RefreshRecycler();
+
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        new RefreshChats(ConversationActivity.this).execute();
+                    }
+                });
+            }
+        };
+
+        timer.schedule(task, 0, 1000); //it executes this every 1000ms
     }
 
     private void RefreshRecycler() {
@@ -62,6 +82,8 @@ public class ConversationActivity extends AppCompatActivity {
         Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
 //        conv.mMessages.add(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()));
         new SendMessage(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()),this,mMessageRecycler).execute();
+        mMessageEditText.setText("");
+
     }
 
     final class RefreshChats extends AsyncTask<Void, Integer, Conversations> {
@@ -179,7 +201,6 @@ public class ConversationActivity extends AppCompatActivity {
 
         }
     }
-
 
 
 
