@@ -3,6 +3,11 @@ package com.example.project3.Model;
 public class Model {
     private static Model instance;
     private boolean isInitialized = false;
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     private User user;
     private Conversations conversations;
 

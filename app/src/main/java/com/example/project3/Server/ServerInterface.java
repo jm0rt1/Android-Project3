@@ -7,9 +7,11 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.project3.Model.Message;
 import com.example.project3.Model.User;
 
 import org.json.JSONArray;
@@ -30,13 +32,17 @@ public class ServerInterface {
             public static String MESSAGES_ADD = "http://10.0.2.2/jm/api/messages/add";
             public static String MESSAGES = "http://10.0.2.2/jm/api/messages";
             public static String MESSAGES_DELETE = "http://10.0.2.2/jm/api/posts/delete";
+            public static String MESSAGES_BY_SENDER = "http://10.0.2.2/jm/api/messages/by_sender/";
+            public static String MESSAGES_BY_RECIPIENT = "http://10.0.2.2/jm/api/messages/by_recipient/";
+
 
         }
         private static class Keys {
-            public static String TITLE ="title";
-            public static String CONTENT = "content";
-            public static String OWNER = "owner_id";
             public static String ID = "id";
+            public static String MESSAGE_BODY ="message_body";
+            public static String SENDER_ID = "sender_id";
+            public static String PARENT_MESSAGE_ID = "parent_message_id";
+            public static String RECIPIENT_ID = "recipient_id";
         }
 
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -49,39 +55,50 @@ public class ServerInterface {
         }
 
         @RequiresApi(api = Build.VERSION_CODES.O)
-        private static ArrayList<String> getTitles() throws JSONException {
-            guard();
+        public static ArrayList<Message> getSentMessages(int senderId) throws JSONException {
 
-            JSONArray jsonArray = new JSONArray(JsonCache);
-            ArrayList<String> names = new ArrayList<String>();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                names.add(obj.getString(Keys.TITLE));
-            }
-            return names;
+            JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.MESSAGES_BY_SENDER+String.valueOf(senderId));
+            ArrayList<Message> messages = jsonCacheToArrayList();
+
+            return messages;
         }
+
 
         @RequiresApi(api = Build.VERSION_CODES.O)
-        private static ArrayList<String[]> getPosts() throws JSONException {
+        public static ArrayList<Message> getRecievedMessages(int recipientId) throws JSONException {
 
-            guard();
+            JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.MESSAGES_BY_RECIPIENT+String.valueOf(recipientId));
+            ArrayList<Message> messages = jsonCacheToArrayList();
 
-            JSONArray jsonArray = new JSONArray(JsonCache);
-            ArrayList<String[]> names = new ArrayList<>();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                String[] pair = new String[3];
-                JSONObject obj = jsonArray.getJSONObject(i);
-                pair[0] = obj.getString(Keys.TITLE);
-                pair[1] = obj.getString(Keys.CONTENT);
-                pair[2] = obj.getString(Keys.ID);
-
-                names.add(pair);
-
-            }
-            return names;
+            return messages;
         }
 
-        private static boolean sendPost(int owner_id,String title, String content,  Context c){
+        @NonNull
+        private static ArrayList<Message> jsonCacheToArrayList() throws JSONException {
+            JSONArray jsonArray = new JSONArray(JsonCache);
+            ArrayList<Message> messages = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                int parent;
+                if (obj.getString(Keys.PARENT_MESSAGE_ID).equals("null")){
+                    parent = 0;
+                } else{
+                    parent = Integer.parseInt(obj.getString(Keys.PARENT_MESSAGE_ID));
+                }
+                Message message = new Message(Integer.parseInt(obj.getString(Keys.ID)),
+                        obj.getString(Keys.MESSAGE_BODY),
+                        Integer.parseInt(obj.getString(Keys.SENDER_ID)),
+                        parent,
+                        Integer.parseInt(obj.getString(Keys.RECIPIENT_ID)));
+
+
+                messages.add(message);
+
+            }
+            return messages;
+        }
+
+        private static boolean sendMessage(int owner_id, String title, String content, Context c){
 
 
 
@@ -101,13 +118,13 @@ public class ServerInterface {
             else
             {
                 JSONObject newPost = new JSONObject();
-                try {
-                    newPost.put(Keys.TITLE, title);
-                    newPost.put(Keys.CONTENT, content);
-                    newPost.put(Keys.OWNER, owner_id);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    newPost.put(Keys.TITLE, title);
+//                    newPost.put(Keys.CONTENT, content);
+//                    newPost.put(Keys.OWNER, owner_id);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
 
                 return ServerCommands.sendHttpPostRequest(ServerCommands.Urls.MESSAGES_ADD, newPost);
 
@@ -120,100 +137,6 @@ public class ServerInterface {
             return result;
         }
 
-        final static class Download extends AsyncTask<Void, Integer, ArrayList<String[]>> {
-
-            private final WeakReference<Activity> parentRef;
-            private final WeakReference<RecyclerView> recyclerViewRef;
-
-            public Download(final Activity parent, RecyclerView recyclerView) {
-                parentRef = new WeakReference<Activity>(parent);
-                recyclerViewRef= new WeakReference<RecyclerView>(recyclerView);
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            protected ArrayList<String[]> doInBackground(Void... voids) {
-                try {
-                    ArrayList<String[]> posts = Messages.getPosts();
-                    return posts;
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(ArrayList<String[]> data) {
-
-
-//                final PostRecyclerAdapter adapter = new PostRecyclerAdapter(parentRef.get().getApplicationContext(), data);
-//
-//                recyclerViewRef.get().setHasFixedSize(true);
-//                recyclerViewRef.get().setAdapter(adapter);
-//                recyclerViewRef.get().setItemAnimator(new DefaultItemAnimator());
-            }
-        }
-
-
-        final static class Upload extends AsyncTask<Void, Integer, Boolean> {
-
-            private final WeakReference<Activity> parentRef;
-            private final int mOwner_id;
-            private final String mTitle;
-            private final String mContent;
-
-            public Upload(final Activity parent,int owner_id,String title, String content) {
-                parentRef = new WeakReference<Activity>(parent);
-                mOwner_id= owner_id;
-                mTitle= title;
-                mContent=content;
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                     return Messages.sendPost(mOwner_id, mTitle, mContent, parentRef.get().getApplicationContext());
-
-                } catch (Exception e) {
-                    Log.e(TAG,e.toString());
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-
-            }
-        }
-
-
-        final static class Delete extends AsyncTask<Void, Integer, Boolean> {
-
-            private final String mId;
-
-            public Delete(String id) {
-                mId = id;
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    return Messages.deletePost(mId);
-
-                } catch (Exception e) {
-                    Log.e(TAG,e.toString());
-                    return false;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-
-            }
-        }
 
     }
 

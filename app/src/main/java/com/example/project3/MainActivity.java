@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (user.password.equals(mPassword) ){  // TODO Yes, this would probably be done server-side
+                    Model.getInstance().setUser(user);
                     return true;
                 }
                 return false;
