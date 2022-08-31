@@ -241,13 +241,17 @@ public class ServerInterface {
             }
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
-        private static User getUserByName(String name) throws JSONException {
+        public static User getUserByName(String name) throws JSONException {
             JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.USERS_BY_NAME+name);
+            if (JsonCache == null){
+                Log.e(TAG, "Unsuccessful login due to network error");
+                return null;
+            }
             JSONArray jsonArray = new JSONArray(JsonCache);
 
 
             //Names should be unique
-            if (jsonArray.length() == 0 ||jsonArray.length() > 1){
+            if (jsonArray.length() == 0 || jsonArray.length() > 1){
                 return null;
             }
 
@@ -261,50 +265,7 @@ public class ServerInterface {
 
             return user;
         }
-        public static class VerifyLogin extends AsyncTask<Void, Integer, Boolean> {
-            private final WeakReference<Activity> parentRef;
-
-            private String mName;
-            private String mPassword;
-
-
-            public VerifyLogin(final Activity parent,String name, String pwd){
-                parentRef = new WeakReference<Activity>(parent);
-                mName= name;
-                mPassword = pwd;
-            }
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                try {
-                    User user = Users.getUserByName(mName);
-                    if (user == null){
-                        return false;
-                    }
-
-                    if (user.password == mPassword){  // TODO Yes, this would probably be done server-side
-                        return true;
-                    }
-                    return false;
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-
-            }
-            @Override
-            protected void onPostExecute(Boolean result) {
-                if (result){
-                    return;
-
-                }else{
-                    return;
-                }
-            }
-        }
 
     }
-
 }
+
