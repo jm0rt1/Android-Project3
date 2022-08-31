@@ -118,23 +118,25 @@ public class ConversationActivity extends AppCompatActivity {
 
                 // TODO Build conversations and save into model
                 Conversations conversations = new Conversations();
+                ArrayList<Integer> otherUserIds = new ArrayList();
                 ArrayList<User> otherUsers = new ArrayList();
-                for (int i=0; i<sentMessages.size();i++){
-                    for (int j=0; j<otherUsers.size();j++){
-                        if (otherUsers.get(j).id == (sentMessages.get(i).getRecipientId())){
-                            ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId());
-                            otherUsers.add(ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId()));
-                        }
-                    }
 
+                for (int i=0; i<sentMessages.size();i++){
+                    if (!otherUserIds.contains(sentMessages.get(i).getRecipientId())){
+                        ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId());
+                        otherUsers.add(ServerInterface.Users.getUserById(sentMessages.get(i).getRecipientId()));
+                        otherUserIds.add(sentMessages.get(i).getRecipientId());
+                    }
                 }
                 for (int i=0; i<receivedMessages.size();i++){
-                    for (int j=0; j<otherUsers.size();j++){
-                        if (otherUsers.get(j).id == (receivedMessages.get(i).getRecipientId())){
-                            ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId());
-                            otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getRecipientId()));
-                        }
+
+                    if (!otherUserIds.contains(receivedMessages.get(i).getSenderId())){
+                        ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId());
+                        otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getRecipientId()));
+                        otherUserIds.add(receivedMessages.get(i).getSenderId());
+
                     }
+
                 }
 
                 int otherUserId =0;
@@ -172,6 +174,7 @@ public class ConversationActivity extends AppCompatActivity {
 
 
                 return conversations;
+
 
 
             } catch (JSONException e) {
