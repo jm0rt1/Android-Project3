@@ -4,6 +4,7 @@ public class Model {
     private static Model instance;
     private boolean isInitialized = false;
     private User user;
+    private Conversations conversations;
 
     public static synchronized Model getInstance() {
         if (instance == null) {
@@ -18,5 +19,9 @@ public class Model {
     }
     public User getUser() {
         return user;
+    }
+
+    public Conversations getConversations() {
+        return conversations;
     }
 }
