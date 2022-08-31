@@ -261,7 +261,7 @@ public class ServerInterface {
 
             user.name = obj.getString(Users.Keys.NAME);
             user.password = obj.getString(Keys.PASSWORD);
-            user.id = obj.getString(Users.Keys.ID);
+            user.id = Integer.parseInt(obj.getString(Users.Keys.ID));
 
             return user;
         }
