@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.project3.Model.User;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,9 +24,14 @@ import java.util.Objects;
 public class ServerInterface {
     public static final String TAG = "ServerInterface";
     public static class Messages {
-        private static String messagesJsonCache = ""; // TODO: need to cache this in a better way for a bigger database
+        private static String JsonCache = ""; // TODO: need to cache this in a better way for a bigger database
         private static long timeSinceLastUpdate = 0;
+        public static class Urls{
+            public static String MESSAGES_ADD = "http://10.0.2.2/jm/api/messages/add";
+            public static String MESSAGES = "http://10.0.2.2/jm/api/messages";
+            public static String MESSAGES_DELETE = "http://10.0.2.2/jm/api/posts/delete";
 
+        }
         private static class Keys {
             public static String TITLE ="title";
             public static String CONTENT = "content";
@@ -36,8 +43,8 @@ public class ServerInterface {
         private static void  guard(){
             //Call first in every method
 
-            if ((Objects.equals(messagesJsonCache, "") || timeSinceLastUpdate == 0)||(timeSinceLastUpdate+(1000)*60 > Instant.now().toEpochMilli())){
-                messagesJsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(ServerCommands.Urls.MESSAGES);
+            if ((Objects.equals(JsonCache, "") || timeSinceLastUpdate == 0)||(timeSinceLastUpdate+(1000)*60 > Instant.now().toEpochMilli())){
+                JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(ServerCommands.Urls.MESSAGES);
             }
         }
 
@@ -45,7 +52,7 @@ public class ServerInterface {
         private static ArrayList<String> getTitles() throws JSONException {
             guard();
 
-            JSONArray jsonArray = new JSONArray(messagesJsonCache);
+            JSONArray jsonArray = new JSONArray(JsonCache);
             ArrayList<String> names = new ArrayList<String>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
@@ -59,7 +66,7 @@ public class ServerInterface {
 
             guard();
 
-            JSONArray jsonArray = new JSONArray(messagesJsonCache);
+            JSONArray jsonArray = new JSONArray(JsonCache);
             ArrayList<String[]> names = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 String[] pair = new String[3];
@@ -112,6 +119,7 @@ public class ServerInterface {
             boolean result = ServerCommands.sendHttpDeleteRequest(ServerCommands.Urls.MESSAGES_DELETE +"?id="+ id);
             return result;
         }
+
         final static class Download extends AsyncTask<Void, Integer, ArrayList<String[]>> {
 
             private final WeakReference<Activity> parentRef;
@@ -208,4 +216,95 @@ public class ServerInterface {
         }
 
     }
+
+    public static class Users {
+
+        private static String JsonCache = ""; // TODO: need to cache this in a better way for a bigger database
+        private static long timeSinceLastUpdate = 0;
+        private static class Keys {
+            public static String NAME ="name";
+            public static String PASSWORD = "password";
+            public static String ID = "id";
+        }
+        private static class Urls{
+            public static String USERS = "http://10.0.2.2/jm/api/users";
+            public static String USERS_BY_ID = "http://10.0.2.2/jm/api/users/by_id/";
+            public static String USERS_BY_NAME = "http://10.0.2.2/jm/api/users/by_name/";
+
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        private static void  guard(){
+            //Call first in every method
+
+            if ((Objects.equals(JsonCache, "") || timeSinceLastUpdate == 0)||(timeSinceLastUpdate+(1000)*60 > Instant.now().toEpochMilli())){
+                JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.USERS);
+            }
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        private static User getUserByName(String name) throws JSONException {
+            JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.USERS_BY_NAME+name);
+            JSONArray jsonArray = new JSONArray(JsonCache);
+
+
+            //Names should be unique
+            if (jsonArray.length() == 0 ||jsonArray.length() > 1){
+                return null;
+            }
+
+
+            User user = new User();
+            JSONObject obj = jsonArray.getJSONObject(0);
+
+            user.name = obj.getString(Users.Keys.NAME);
+            user.password = obj.getString(Keys.PASSWORD);
+            user.id = obj.getString(Users.Keys.ID);
+
+            return user;
+        }
+        public static class VerifyLogin extends AsyncTask<Void, Integer, Boolean> {
+            private final WeakReference<Activity> parentRef;
+
+            private String mName;
+            private String mPassword;
+
+
+            public VerifyLogin(final Activity parent,String name, String pwd){
+                parentRef = new WeakReference<Activity>(parent);
+                mName= name;
+                mPassword = pwd;
+            }
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    User user = Users.getUserByName(mName);
+                    if (user == null){
+                        return false;
+                    }
+
+                    if (user.password == mPassword){  // TODO Yes, this would probably be done server-side
+                        return true;
+                    }
+                    return false;
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+            @Override
+            protected void onPostExecute(Boolean result) {
+                if (result){
+                    return;
+
+                }else{
+                    return;
+                }
+            }
+        }
+
+    }
+
 }

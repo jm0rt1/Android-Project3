@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.project3.Model.Model;
+
 public class MainActivity extends AppCompatActivity {
     EditText mNameEditText;
     EditText mPasswordEditText;
@@ -16,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Model.getInstance();
 
         initUIResources();
     }
@@ -27,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login(View v){
+        String inputtedName = mNameEditText.getText().toString();
+        String inputtedPassword = mPasswordEditText.getText().toString();
+
 
     }
 }
