@@ -38,6 +38,8 @@ public class Conversations {
         }
         return null;
     }
+
+
     public String[] getChatNames(){
         String[] chatNames = new String[mConversations.size()];
         for (int i=0; i<mConversations.size(); i++){

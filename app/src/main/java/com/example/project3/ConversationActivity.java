@@ -80,7 +80,6 @@ public class ConversationActivity extends AppCompatActivity {
     public void send(View v){
         String message = mMessageEditText.getText().toString();
         Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
-//        conv.mMessages.add(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()));
         new SendMessage(new Message(3,message,Model.getInstance().getUser().id,conv.mMessages.get(conv.mMessages.size()-1).getId(),conv.mOtherUser.id,conv.getConversationId()),this,mMessageRecycler).execute();
         mMessageEditText.setText("");
 
