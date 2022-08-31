@@ -1,7 +1,9 @@
 package com.example.project3;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.project3.Model.Conversations;
@@ -29,20 +32,39 @@ import java.util.Comparator;
 public class ConversationActivity extends AppCompatActivity {
     private RecyclerView mMessageRecycler;
     private ConversationAdapter mMessageAdapter;
+
+    private EditText mMessageEditText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
 
-        mMessageRecycler = (RecyclerView) findViewById(R.id.conversation_recycler_view);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.custom_toolbar);
+        setSupportActionBar(myToolbar);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
+        mMessageRecycler = (RecyclerView) findViewById(R.id.conversation_recycler_view);
+        mMessageEditText = (EditText)  findViewById(R.id.message_edit_text);
+
+        RefreshRecycler();
+    }
+
+    private void RefreshRecycler() {
         Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
 
         mMessageAdapter = new ConversationAdapter(this, conv);
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
         mMessageRecycler.setAdapter(mMessageAdapter);
+        mMessageRecycler.scrollToPosition(conv.mMessages.size()-1);
     }
 
+    public void send(View v){
+        String message = mMessageEditText.getText().toString();
+        Conversations.Conversation conv = Model.getInstance().getConversations().getConversationById(1);
+        conv.mMessages.add(new Message(3,message,1,4,2,1));
+        RefreshRecycler();
+    }
 
     final class RefreshChats extends AsyncTask<Void, Integer, Conversations> {
         private final WeakReference<Activity> parentRef;
@@ -129,25 +151,8 @@ public class ConversationActivity extends AppCompatActivity {
 
             Model.getInstance().setConversations(result);
 
-            Model.getInstance().getConversations();
-            listViewRef.get();
 
-            ;
-            ChatsList adapter = new ChatsList(ChatsActivity.this, Model.getInstance().getConversations().getChatNames());
-
-
-            ListView listView = (ListView) findViewById(R.id.my_list_view);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long l) {
-
-
-                    Intent intent = new Intent(parentRef.get().getApplicationContext(), ConversationActivity.class);
-                    startActivity(intent);
-
-                }
-            });
+            }
         }
-    }
+
 }
