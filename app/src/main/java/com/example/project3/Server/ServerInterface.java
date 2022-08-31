@@ -192,6 +192,32 @@ public class ServerInterface {
             return user;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public static User getUserById(int id) throws JSONException {
+            JsonCache = ServerCommands.downloadJSONUsingHTTPGetRequest(Urls.USERS_BY_ID+id);
+            if (JsonCache == null){
+                Log.e(TAG, "Unsuccessful login due to network error");
+                return null;
+            }
+            JSONArray jsonArray = new JSONArray(JsonCache);
+
+
+            //Names should be unique
+            if (jsonArray.length() == 0 || jsonArray.length() > 1){
+                return null;
+            }
+
+
+            User user = new User();
+            JSONObject obj = jsonArray.getJSONObject(0);
+
+            user.name = obj.getString(Users.Keys.NAME);
+            user.password = obj.getString(Keys.PASSWORD);
+            user.id = Integer.parseInt(obj.getString(Users.Keys.ID));
+
+            return user;
+        }
+
     }
 }
 
