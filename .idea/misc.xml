@@ -5,10 +5,11 @@
       <map>
         <entry key="app/src/main/res/layout/activity_chats.xml" value="0.3079710144927536" />
         <entry key="app/src/main/res/layout/activity_conversation.xml" value="0.2682926829268293" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/chats_list_view_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.26683959960937503" />
+        <entry key="app/src/main/res/layout/chats_list_view_item.xml" value="0.15366058349609377" />
         <entry key="app/src/main/res/layout/message_received_item.xml" value="0.26497758055651205" />
         <entry key="app/src/main/res/layout/message_sent_item.xml" value="0.17512817382812496" />
+        <entry key="app/src/main/res/menu/chats_menu.xml" value="0.27870370370370373" />
       </map>
     </option>
   </component>
