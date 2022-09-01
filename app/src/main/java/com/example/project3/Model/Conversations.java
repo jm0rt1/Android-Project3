@@ -55,6 +55,14 @@ public class Conversations {
         return chatNames;
     }
 
+    public String[] getMostRecentMessages(){
+        String[] messages = new String[mConversations.size()];
+        for (int i=0; i<mConversations.size(); i++){
+            messages[i]=(mConversations.get(i).mMessages.get(mConversations.get(i).mMessages.size()-1).getMessageBody());
+        }
+        return messages;
+    }
+
     public Integer[] getUserIds(){
         Integer[] ids = new Integer[mConversations.size()];
         for (int i=0; i<mConversations.size(); i++){

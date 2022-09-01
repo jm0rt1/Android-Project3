@@ -80,7 +80,7 @@ public class ChatsActivity extends AppCompatActivity {
 
                     if (!otherUserIds.contains(receivedMessages.get(i).getSenderId())){
                         ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId());
-                        otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getRecipientId()));
+                        otherUsers.add(ServerInterface.Users.getUserById(receivedMessages.get(i).getSenderId()));
                         otherUserIds.add(receivedMessages.get(i).getSenderId());
 
                     }
@@ -89,13 +89,10 @@ public class ChatsActivity extends AppCompatActivity {
 
                 int otherUserId =0;
                 for (int i=0; i<otherUsers.size(); i++){
-//                    ArrayList<Message> convSent = ServerInterface.Messages.getSentMessages(Model.getInstance().getUser().id);
-//                    ArrayList<Message> convReceived = ServerInterface.Messages.getRecievedMessages(Model.getInstance().getUser().id);
-
                     ArrayList<Message> messages = new ArrayList<>();
 
                     for (int j=0; j<receivedMessages.size();j++){
-                        otherUserId = receivedMessages.get(i).getSenderId();
+                        otherUserId = receivedMessages.get(j).getSenderId();
                         if (otherUsers.get(i).id == otherUserId){
                             otherUserId = receivedMessages.get(j).getSenderId();
                             messages.add(receivedMessages.get(j) );
@@ -103,7 +100,7 @@ public class ChatsActivity extends AppCompatActivity {
                     }
 
                     for (int j=0; j<sentMessages.size();j++){
-                        otherUserId = sentMessages.get(i).getRecipientId();
+                        otherUserId = sentMessages.get(j).getRecipientId();
                         if (otherUsers.get(i).id == otherUserId){
                             otherUserId = sentMessages.get(j).getRecipientId();
                             messages.add(sentMessages.get(j));
@@ -111,7 +108,8 @@ public class ChatsActivity extends AppCompatActivity {
                     }
                     if (messages.size()>0){
                         if (otherUserId != 0) {
-                            User other = ServerInterface.Users.getUserById(otherUserId);
+
+                            User other = ServerInterface.Users.getUserById(otherUsers.get(i).id);
                             messages.sort(Comparator.comparing(Message::getParentMessageId));
                             Conversations.Conversation conv = new Conversations.Conversation(messages,other);
                             conversations.addConversation(conv);
@@ -139,7 +137,7 @@ public class ChatsActivity extends AppCompatActivity {
             listViewRef.get();
             Integer[] ids = Model.getInstance().getConversations().getUserIds();
 
-            ChatsList adapter = new ChatsList(ChatsActivity.this, Model.getInstance().getConversations().getChatNames());
+            ChatsList adapter = new ChatsList(ChatsActivity.this, Model.getInstance().getConversations().getChatNames(), Model.getInstance().getConversations().getMostRecentMessages());
 
 
             ListView listView = (ListView) findViewById(R.id.my_list_view);
