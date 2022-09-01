@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -91,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
 
 
             }else{
+
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                builder1.setTitle("Could Not Log In");
+                builder1.setMessage("User Name and/or Password is incorrect");
+                builder1.show();
                 return;
             }
         }
